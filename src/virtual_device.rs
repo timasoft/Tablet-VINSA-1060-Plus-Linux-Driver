@@ -1,11 +1,11 @@
 // VINSA 1060 Plus Linux Driver (V2), (by feveal@hotmail.com)
-use std::io::Error;
 use std::collections::HashMap;
+use std::io::Error;
 
 use evdev::{
-    uinput::{VirtualDevice, VirtualDeviceBuilder},
     AbsInfo, AbsoluteAxisType, AttributeSet, EventType, InputEvent, Key, Synchronization,
     UinputAbsSetup,
+    uinput::{VirtualDevice, VirtualDeviceBuilder},
 };
 
 #[derive(Default)]
@@ -91,18 +91,18 @@ impl DeviceDispatcher {
 
     pub fn new() -> Self {
         let default_tablet_button_id_to_key_code_map: HashMap<u8, Vec<Key>> = [
-            (0, vec![Key::KEY_TAB]),        // TAB
-            (1, vec![Key::KEY_SPACE]),      // SPACE
-            (2, vec![Key::KEY_LEFTALT]),    // ALT
-            (3, vec![Key::KEY_LEFTCTRL]),   // CTRL
-            (4, vec![Key::KEY_PAGEUP]),     // MOUSE UP
-            (5, vec![Key::KEY_PAGEDOWN]),   // MOUSE DOWN
-            (6, vec![Key::KEY_LEFTBRACE]),  // MOUSE AREA -
+            (0, vec![Key::KEY_TAB]),                        // TAB
+            (1, vec![Key::KEY_SPACE]),                      // SPACE
+            (2, vec![Key::KEY_LEFTALT]),                    // ALT
+            (3, vec![Key::KEY_LEFTCTRL]),                   // CTRL
+            (4, vec![Key::KEY_PAGEUP]),                     // MOUSE UP
+            (5, vec![Key::KEY_PAGEDOWN]),                   // MOUSE DOWN
+            (6, vec![Key::KEY_LEFTBRACE]),                  // MOUSE AREA -
             (7, vec![Key::KEY_LEFTCTRL, Key::KEY_KPMINUS]), // CTRL- ZOOM
             (8, vec![Key::KEY_LEFTCTRL, Key::KEY_KPPLUS]),  // CTRL+ ZOOM
-            (9, vec![Key::KEY_ESC]),        // ESC CANCEL
-            (12, vec![Key::KEY_B]),         // TOGGLE MOUSE/TABLET
-            (13, vec![Key::KEY_RIGHTBRACE]), // MOUSE AREA +
+            (9, vec![Key::KEY_ESC]),                        // ESC CANCEL
+            (12, vec![Key::KEY_B]),                         // TOGGLE MOUSE/TABLET
+            (13, vec![Key::KEY_RIGHTBRACE]),                // MOUSE AREA +
         ]
         .iter()
         .cloned()
@@ -221,14 +221,24 @@ impl DeviceDispatcher {
             // Button ] - Enlarge mouse area
             if i == 13 && state == Self::PRESSED {
                 self.mouse_area_scale = (self.mouse_area_scale * 1.2).min(0.4);
-                eprintln!("Mouse area increased: {:.0}%", self.mouse_area_scale * 100.0);
+                eprintln!(
+                    "Mouse area increased: {:.0}%",
+                    self.mouse_area_scale * 100.0
+                );
                 return;
             }
 
             // Toggle with B button
             if i == 12 && state == Self::PRESSED {
                 self.is_mouse_mode = !self.is_mouse_mode;
-                eprintln!("Mode: {}", if self.is_mouse_mode { "MOUSE" } else { "TABLET" });
+                eprintln!(
+                    "Mode: {}",
+                    if self.is_mouse_mode {
+                        "MOUSE"
+                    } else {
+                        "TABLET"
+                    }
+                );
                 return;
             }
 
@@ -307,7 +317,7 @@ impl DeviceDispatcher {
             smoothed_x,
             smoothed_y,
             normalized_pressure,
-            is_multimedia_area
+            is_multimedia_area,
         );
 
         self.pen_emit_touch(raw_data);
@@ -320,7 +330,13 @@ impl DeviceDispatcher {
         }
     }
 
-    fn raw_pen_abs_to_pen_abs_events(&mut self, x_axis: i32, y_axis: i32, pressure: i32, is_multimedia_area: bool) {
+    fn raw_pen_abs_to_pen_abs_events(
+        &mut self,
+        x_axis: i32,
+        y_axis: i32,
+        pressure: i32,
+        is_multimedia_area: bool,
+    ) {
         let (x, y) = if is_multimedia_area {
             (self.last_valid_x, 0) // Use last valid X and top position
         } else if self.is_mouse_mode {
@@ -337,23 +353,29 @@ impl DeviceDispatcher {
             (x_axis, y_axis.clamp(0, 4095))
         };
 
-        self.virtual_pen.emit(&[InputEvent::new(
-            EventType::ABSOLUTE,
-            AbsoluteAxisType::ABS_X.0,
-            x,
-        )]).expect("Error emitting ABS_X.");
+        self.virtual_pen
+            .emit(&[InputEvent::new(
+                EventType::ABSOLUTE,
+                AbsoluteAxisType::ABS_X.0,
+                x,
+            )])
+            .expect("Error emitting ABS_X.");
 
-        self.virtual_pen.emit(&[InputEvent::new(
-            EventType::ABSOLUTE,
-            AbsoluteAxisType::ABS_Y.0,
-            y,
-        )]).expect("Error emitting ABS_Y.");
+        self.virtual_pen
+            .emit(&[InputEvent::new(
+                EventType::ABSOLUTE,
+                AbsoluteAxisType::ABS_Y.0,
+                y,
+            )])
+            .expect("Error emitting ABS_Y.");
 
-        self.virtual_pen.emit(&[InputEvent::new(
-            EventType::ABSOLUTE,
-            AbsoluteAxisType::ABS_PRESSURE.0,
-            pressure,
-        )]).expect("Error emitting Pressure.");
+        self.virtual_pen
+            .emit(&[InputEvent::new(
+                EventType::ABSOLUTE,
+                AbsoluteAxisType::ABS_PRESSURE.0,
+                pressure,
+            )])
+            .expect("Error emitting Pressure.");
     }
 
     fn pen_emit_touch(&mut self, raw_data: &RawDataReader) {
@@ -369,11 +391,13 @@ impl DeviceDispatcher {
             (true, false) => Some(Self::RELEASED),
             _ => None,
         } {
-            self.virtual_pen.emit(&[InputEvent::new(
-                EventType::KEY,
-                Key::BTN_TOUCH.code(),
-                state,
-            )]).expect("Error emitting Touch");
+            self.virtual_pen
+                .emit(&[InputEvent::new(
+                    EventType::KEY,
+                    Key::BTN_TOUCH.code(),
+                    state,
+                )])
+                .expect("Error emitting Touch");
         }
         self.was_touching = is_touching;
     }
