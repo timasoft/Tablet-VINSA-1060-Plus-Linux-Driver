@@ -1,10 +1,12 @@
 mod physical_device;
 mod virtual_device;
 
+use rusb::Error as RusbError;
 use signal_hook::consts::signal::*;
 use signal_hook::flag::register;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Duration;
 
 use physical_device::PhysicalDevice;
 use virtual_device::{DeviceDispatcher, RawDataReader};
@@ -20,19 +22,22 @@ fn main() {
     let mut device_dispatcher = DeviceDispatcher::new();
 
     println!("Driver is running.");
-    main_loop({
-        || {
-            if physical_device
-                .read_device_responses(&mut data_reader.data)
-                .is_ok()
-            {
+    main_loop(
+        || match physical_device.read_device_responses(&mut data_reader.data) {
+            Ok(0) => std::thread::sleep(Duration::from_millis(1)),
+            Ok(_) => {
                 device_dispatcher.dispatch(&data_reader);
                 if device_dispatcher.syn().is_err() {
                     println!("Error emitting SYN.");
                 }
             }
-        }
-    });
+            Err(RusbError::Timeout | RusbError::Interrupted) => {}
+            Err(error) => {
+                eprintln!("Read error: {error}.");
+                std::thread::sleep(Duration::from_secs(1));
+            }
+        },
+    );
 }
 
 fn main_loop(mut f: impl FnMut()) {

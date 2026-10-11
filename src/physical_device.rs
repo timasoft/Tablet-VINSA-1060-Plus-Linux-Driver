@@ -1,6 +1,6 @@
 use rusb::{
-    devices, ConfigDescriptor, Device, DeviceHandle, Error as RusbError, GlobalContext,
-    InterfaceDescriptor, TransferType,
+    ConfigDescriptor, Device, DeviceHandle, Error as RusbError, GlobalContext, InterfaceDescriptor,
+    TransferType, devices,
 };
 
 use std::time::Duration;
