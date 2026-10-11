@@ -21,15 +21,15 @@ The [marvinbelfort](https://github.com/marvinbelfort/mx002_linux_driver) driver 
 -  No sudo required (udev rules included)
 -  Desktop launcher with custom icon
 
-![Buttons help](https://github.com/feveal/Tablet-VINSA-1060-Plus-Linux-Driver/blob/main/driver/launcher/help/v1060p.png)
+![Buttons help](./assets/v1060p.png)
 
 ## 📦 Installation
 You need to have Rust installed previously.
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/vinsa-1060-driver.git
-cd vinsa-1060-driver
+git clone https://github.com/timasoft/Tablet-VINSA-1060-Plus-Linux-Driver.git
+cd Tablet-VINSA-1060-Plus-Linux-Driver
 
 # Build the driver
 cargo build --release
