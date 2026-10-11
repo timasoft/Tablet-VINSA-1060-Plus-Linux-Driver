@@ -146,7 +146,7 @@ impl DeviceDispatcher {
 
     fn smooth_coordinates(&mut self, x: i32, y: i32) -> (i32, i32) {
         let (smoothed_x, smoothed_y) = if self.is_mouse_mode {
-            ((self.last_x * 1 + x) / 2, (self.last_y * 1 + y) / 2)
+            ((self.last_x + x) / 2, (self.last_y + y) / 2)
         } else {
             ((self.last_x * 3 + x) / 4, (self.last_y * 3 + y) / 4)
         };
@@ -408,13 +408,12 @@ impl DeviceDispatcher {
             (x, 2) if x == 6 || x == 4 => Some((Self::RELEASED, x)),
             (x, y) if x != 2 && x == y => Some((Self::HOLD, x)),
             _ => None,
-        } {
-            if let Some(keys) = self.pen_button_id_to_key_code_map.get(&id) {
-                for key in keys {
-                    self.virtual_pen
-                        .emit(&[InputEvent::new(EventType::KEY, key.code(), state)])
-                        .expect("Error emitting pen keys.")
-                }
+        } && let Some(keys) = self.pen_button_id_to_key_code_map.get(&id)
+        {
+            for key in keys {
+                self.virtual_pen
+                    .emit(&[InputEvent::new(EventType::KEY, key.code(), state)])
+                    .expect("Error emitting pen keys.")
             }
         }
     }

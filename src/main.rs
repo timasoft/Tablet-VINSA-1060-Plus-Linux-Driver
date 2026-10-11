@@ -5,7 +5,6 @@ use signal_hook::consts::signal::*;
 use signal_hook::flag::register;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::u16;
 
 use physical_device::PhysicalDevice;
 use virtual_device::{DeviceDispatcher, RawDataReader};

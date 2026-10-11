@@ -94,7 +94,7 @@ impl PhysicalDevice {
     }
     fn get_hid_interface_descriptors(
         config_descriptors: &[ConfigDescriptor],
-    ) -> Vec<InterfaceDescriptor> {
+    ) -> Vec<InterfaceDescriptor<'_>> {
         config_descriptors
             .iter()
             .flat_map(|config_descriptor| config_descriptor.interfaces())
