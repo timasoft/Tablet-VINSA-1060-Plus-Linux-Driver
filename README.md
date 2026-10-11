@@ -54,6 +54,30 @@ chmod +x target/release/v1060p
 change the path where the "v1060p" driver file was placed.
 ```
 
+## NixOS (Flakes)
+
+Add the flake as an input:
+
+```nix
+# flake.nix
+inputs.vinsa-tablet.url = "github:timasoft/Tablet-VINSA-1060-Plus-Linux-Driver";
+```
+
+Enable the driver. This installs the package and runs it as a systemd service:
+
+```nix
+{
+  imports = [ inputs.vinsa-tablet.nixosModules.vinsa-tablet ];
+
+  services.vinsa-tablet.enable = true;
+}
+```
+
+Or install the package only, without the service:
+
+```nix
+environment.systemPackages = [ inputs.vinsa-tablet.packages.${pkgs.system}.default ];
+```
 
 ## References
 - [marvinbelfort](https://github.com/marvinbelfort) - Initial research
