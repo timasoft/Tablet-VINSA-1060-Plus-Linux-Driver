@@ -1,6 +1,6 @@
 use rusb::{
-    ConfigDescriptor, Device, DeviceHandle, Error as RusbError, GlobalContext, InterfaceDescriptor,
-    TransferType, devices,
+    devices, ConfigDescriptor, Device, DeviceHandle, Error as RusbError, GlobalContext,
+    InterfaceDescriptor, TransferType,
 };
 
 use std::time::Duration;
@@ -47,7 +47,7 @@ impl PhysicalDevice {
     }
 
     pub fn reset(&mut self) {
-        self.device_handle.reset().expect("Error reseting device.");
+        self.device_handle.reset().expect("Error resetting device.");
     }
 
     pub fn read_device_responses(&self, buffer: &mut [u8]) -> Result<usize, RusbError> {
